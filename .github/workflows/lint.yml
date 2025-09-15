@@ -1,0 +1,57 @@
+name: Lint
+
+on:
+  pull_request:
+    types: [opened, synchronize, reopened, ready_for_review]
+  push:
+    branches: [ main ]
+  workflow_call:
+
+permissions:
+  contents: read
+  pull-requests: read
+
+concurrency:
+  group: lint-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  ruff-format:
+    name: Ruff Format (check)
+    runs-on: ubuntu-latest
+    if: github.event.pull_request.draft == false || github.event_name != 'pull_request'
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Install uv
+        uses: astral-sh/setup-uv@v6
+        with:
+          python-version-file: .python-version
+          enable-cache: true
+
+      - name: Install the project
+        run: uv sync --locked --all-extras --dev
+
+      - name: Ruff Format (check)
+        run: uv run ruff format --check .
+
+  ruff-lint:
+    name: Ruff Lint
+    runs-on: ubuntu-latest
+    if: github.event.pull_request.draft == false || github.event_name != 'pull_request'
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Install uv
+        uses: astral-sh/setup-uv@v6
+        with:
+          python-version-file: .python-version
+          enable-cache: true
+
+      - name: Install the project
+        run: uv sync --locked --all-extras --dev
+
+      - name: Ruff Lint (check)
+        run: uv run ruff check .
