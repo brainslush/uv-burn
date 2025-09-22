@@ -1,4 +1,3 @@
-import re
 from collections import defaultdict
 
 from packaging.requirements import Requirement
@@ -23,22 +22,6 @@ from .models import (
     UvLock,
 )
 from .repository import PackageName
-
-_PYREF_CLEAN = re.compile(r"^(\d+)(\.\d+){1,2}")
-
-
-def sanitize_python_version(requires_python: str) -> str:
-    """
-    Sanitize the Python version string from the `requires-python` field.
-    Examples:
-      '>=3.12' -> '3.12'
-      '>=3.11,<4.0' -> '3.11'
-    """
-    match = _PYREF_CLEAN.match(requires_python)
-    if not match:
-        raise ValueError(f"Invalid Python version format: {requires_python}")
-
-    return match.group(0)
 
 
 def convert_pyprojects_to_pipfile(pyprojects: list[PyProject]) -> tuple[Pipfile, dict[Url, str]]:

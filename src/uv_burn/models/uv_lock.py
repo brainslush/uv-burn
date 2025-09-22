@@ -1,5 +1,3 @@
-# ruff: noqa: D101
-
 from __future__ import annotations
 
 from datetime import datetime
@@ -44,11 +42,32 @@ class Dependency(BaseModel):
 
 
 class RegistrySource(BaseModel):
+    """
+    Represents a registry source for a package.
+    Example TOML fragment:
+      source = { registry = "https://pypi.org/simple" }
+    """
+
     registry: Url
 
 
 class EditableSource(BaseModel):
+    """
+    Represents an editable source for a package.
+    Should actually not be existent in the lockfile, as editable packages can not be accessed by Veracode.
+    """
+
     editable: str
+
+
+class VirtualSource(BaseModel):
+    """
+    Represents a virtual source for a package.
+    Example TOML fragment:
+      source = { virtual = "." }
+    """
+
+    virtual: str
 
 
 class PackageMetadata(BaseModel):
@@ -90,9 +109,13 @@ class ExternalPackage(BaseModel):
 
 
 class InternalPackage(BaseModel):
+    """
+    A single [[package]] entry for an internal (editable) package.
+    """
+
     name: str
     version: str
-    source: EditableSource
+    source: EditableSource | VirtualSource
     dependencies: list[Dependency] = []
 
     metadata: PackageMetadata
@@ -101,15 +124,14 @@ class InternalPackage(BaseModel):
 type Package = ExternalPackage | InternalPackage
 
 
-class Manifest(BaseModel):
-    members: list[str]
-
-
 class UvLock(BaseModel):
+    """
+    The root model for the uv.lock file.
+    """
+
     version: int
     revision: int
     requires_python: str = Field(alias="requires-python")
-    manifest: Manifest
     packages: list[Package] = Field(alias="package")
 
     def packages_by_type[T: Package](self, type_: type[T]) -> list[T]:

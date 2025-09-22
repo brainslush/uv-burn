@@ -32,8 +32,16 @@ build-backend = "uv_build"
 
 [dependency-groups]
 dev = [
+    "ipdb>=0.13.13",
     "pyright>=1.1.405",
     "ruff>=0.12.9",
+]
+test = [
+    "pipenv>=2025.0.4",
+    "pytest>=8.4.2",
+    "pytest-asyncio>=1.2.0",
+    "pytest-mock>=3.15.1",
+    "testcontainers[nginx]>=4.13.0",
 ]
 
 [[tool.uv.index]]
@@ -77,3 +85,12 @@ ignore = [
     "TC003", # Use Typeching block
     #"RUFFG004"
 ]
+
+[tool.ruff.lint.per-file-ignores]
+"tests/*" = [
+    "S101", # Use of `assert` detected.
+    "S105", # hardcoded password string
+    "PLR2004", # Magic value used in comparison
+    "S106", # Allow hardcoded passwords 
+    "D101", # missing docstring in public class
+] 

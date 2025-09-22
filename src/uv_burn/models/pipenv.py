@@ -1,5 +1,3 @@
-# ruff: noqa: D101
-
 from typing import Annotated
 
 from pydantic import BaseModel, ConfigDict, Field
@@ -7,6 +5,10 @@ from pydantic_core import Url
 
 
 class PipfileSource(BaseModel):
+    """
+    Represents a source in a Pipfile.
+    """
+
     name: str
     url: Url
     verify_ssl: Annotated[bool, Field(alias="verify_ssl")]
@@ -15,6 +17,10 @@ class PipfileSource(BaseModel):
 
 
 class PipfileRequires(BaseModel):
+    """
+    Represents the 'requires' section in a Pipfile.
+    """
+
     python_version: str
 
     model_config = ConfigDict(validate_by_name=True, serialize_by_alias=True)
@@ -34,6 +40,10 @@ class PackageDefinition(BaseModel):
 
 
 class PackageLocal(BaseModel):
+    """
+    Represents a local package.
+    """
+
     path: str
     editable: bool = True
     markers: str | None = None
@@ -42,6 +52,10 @@ class PackageLocal(BaseModel):
 
 
 class PackageGit(BaseModel):
+    """
+    Represents a package from a git repository.
+    """
+
     url: str
     ref: str | None = None
     markers: str | None = None

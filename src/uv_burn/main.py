@@ -7,7 +7,7 @@ import typer
 from rich.logging import RichHandler
 
 from uv_burn.models.uv_lock import ExternalPackage
-from uv_burn.repository import get_indices_from_pyprojecs, get_required_python_versions_from_index
+from uv_burn.repository import get_indices_from_pyprojects, get_required_python_versions_from_index
 
 from .convert import convert_pyprojects_to_pipfile, convert_uv_lock_to_pipfile_lock
 from .io import (
@@ -48,7 +48,7 @@ async def _main(
 
     required_python_versions = await get_required_python_versions_from_index(
         uv_lock.packages_by_type(ExternalPackage),
-        get_indices_from_pyprojecs(pyprojects),
+        get_indices_from_pyprojects(pyprojects),
     )
     pipfile_lock = convert_uv_lock_to_pipfile_lock(uv_lock, hash_pipfile, source_url_name_map, required_python_versions)
     hash_pipfile_lock = save_pipfile_lock(pipfile_lock, pipfile_lock_path)

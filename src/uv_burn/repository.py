@@ -1,6 +1,7 @@
 import asyncio
 import logging
 import os
+import re
 from typing import NewType
 
 from httpx import AsyncClient, BasicAuth
@@ -13,6 +14,7 @@ from uv_burn.models.uv_lock import ExternalPackage
 
 SENTINEL = None  # Sentinel value to indicate the end of the queue
 LOGGER = logging.getLogger(__name__)
+REGEX_NON_ALPHA = re.compile(r"[\W+]")
 
 
 def find_auth(name: str) -> tuple[SecretStr, SecretStr] | None:
@@ -28,8 +30,8 @@ def find_auth(name: str) -> tuple[SecretStr, SecretStr] | None:
         tuple[SecretStr, SecretStr] | None: A tuple containing the username and password as SecretStr,
         or None if the credentials are not found.
     """
-    user = os.getenv(f"UV_INDEX_{name.upper()}_USERNAME", None)
-    pw = os.getenv(f"UV_INDEX_{name.upper()}_PASSWORD", None)
+    user = os.getenv(f"UV_INDEX_{re.sub(REGEX_NON_ALPHA, '_', name.upper())}_USERNAME", None)
+    pw = os.getenv(f"UV_INDEX_{re.sub(REGEX_NON_ALPHA, '_', name.upper())}_PASSWORD", None)
     return (SecretStr(user), SecretStr(pw)) if user and pw else None
 
 
@@ -44,7 +46,9 @@ async def create_client(index_url: Url, auth: tuple[SecretStr, SecretStr] | None
         AsyncClient: An instance of AsyncClient configured with the base URL and authentication.
     """
     auth_method = BasicAuth(auth[0].get_secret_value(), auth[1].get_secret_value()) if auth else None
-    return AsyncClient(base_url=index_url.unicode_string(), auth=auth_method, headers={"Accept": "application/vnd.pypi.simple.v1+json"})
+    return AsyncClient(
+        base_url=index_url.unicode_string(), auth=auth_method, headers={"Accept": "application/vnd.pypi.simple.v1+json"}
+    )
 
 
 async def get_package_info(clients: dict[Url, AsyncClient], package: ExternalPackage) -> PyPiSimpleResponse:
@@ -66,11 +70,11 @@ async def get_package_info(clients: dict[Url, AsyncClient], package: ExternalPac
 PackageName = NewType("PackageName", str)
 
 
-def get_indices_from_pyprojecs(pyprojects: list[PyProject]) -> list[Index]:
+def get_indices_from_pyprojects(pyprojects: list[PyProject]) -> list[Index]:
     """
     Extracts unique indices from a list of packages.
     Args:
-        packages (list[ExternalPackage]): A list of packages from which to extract indices.
+        pyprojects (list[PyProject]): A list of PyProject instances.
     Returns:
         list[Index]: A list of unique indices.
     """
@@ -94,13 +98,13 @@ async def get_required_python_versions_from_index(
 
     clients: dict[Url, AsyncClient] = {}
 
-    LOGGER.debug(f"Creating clients for indices: {[index.url for index in indicies]}")
+    LOGGER.debug("Creating clients for indices: %s", [index.url for index in indicies])
 
     for index in indicies:
         auth = find_auth(index.name)
         clients[index.url] = await create_client(index.url, auth)
 
-    LOGGER.debug(f"Clients created for indices: {list(clients.keys())}")
+    LOGGER.debug("Clients created for indices %s:", list(clients.keys()))
 
     futures = [get_package_info(clients, pkg) for pkg in packages]
     results = await asyncio.gather(*futures)
@@ -111,10 +115,12 @@ async def get_required_python_versions_from_index(
     package_version_markers: dict[PackageName, str] = {}
     for pkg, pkg_simple_info in zip(packages, results, strict=True):
         version_files = [
-            file for file in pkg_simple_info.files if file.version == pkg.version and f"sha256:{file.hashes.sha256}" in pkg.hashes
+            file
+            for file in pkg_simple_info.files
+            if file.version == pkg.version and f"sha256:{file.hashes.sha256}" in pkg.hashes
         ]
         if not version_files:
-            LOGGER.debug(f"Package info received: {pkg_simple_info}")
+            LOGGER.debug("Package info received: %s", pkg_simple_info)
 
             raise ValueError(f"Could not find file for {pkg.name}=={pkg.version} in index {pkg.source.registry}")
 
