@@ -22,10 +22,8 @@ Convert `uv` (Astral's ultra-fast Python package manager) project metadata (`pyp
 - [Authenticated indices](#authenticated-indices)
 - [How it works](#how-it-works-)
 - [Limitations](#limitations-️)
-- [Roadmap](#roadmap-)
 - [Contributing](#contributing-)
 - [FAQ](#faq-)
-- [Security](#security-)
 - [Inspiration & Acknowledgements](#inspiration--acknowledgements-)
 - [License](#license-)
 
@@ -62,9 +60,7 @@ No re-resolution is attempted: the tool faithfully projects the lock state into 
 Install from source (until published on PyPI):
 
 ```bash
-pip install uv-burn  # once published
-# or with uv (recommended for speed)
-uv tool install uv-burn  # future
+pip install uv-burn
 
 # From a local clone
 pip install -e .
@@ -126,36 +122,33 @@ uv-burn .
 7. Writes `Pipfile` + JSON `Pipfile.lock`
 
 ## Limitations
+- Not meant for project conversion; keep using `uv` for development
 - Development dependencies currently not exported (section left empty)
 - Does not re-resolve dependencies; assumes `uv.lock` is authoritative
 - Only first discovered project's `requires-python` used for Pipfile `requires` (multi-root nuance)
 - Git / direct URL dependencies: basic handling; lock fidelity may vary if Pipenv's semantics differ
 - Does not attempt environment marker normalization beyond Python version & those present in `uv.lock`
 
-## Roadmap
-- Export dev dependencies
-- Optional Poetry export
-- Integrity diff mode (compare future `uv.lock` to historical `Pipfile.lock`)
-- Git dependency refinement (exact commit pinning where possible)
-- Structured JSON report output for CI integration
-
 ## Contributing
 Pull requests welcome! Suggested flow:
 1. Fork & create a feature branch
 2. Maintain style (ruff rules configured)
 3. Add / adapt tests (to be added as project matures)
-4. Keep commits focused & descriptive
-5. Open PR explaining motivation / behaviour change
+4. Open PR explaining motivation / behaviour change
 
 ### Dev environment
 ```bash
-uv sync   # (once project adopts uv fully for contributors) or
-pip install -e .[dev]
+uv sync
 ```
 
 Run lint:
 ```bash
 ruff check .
+```
+
+Run formatting:
+```bash
+ruff format .
 ```
 
 ## FAQ

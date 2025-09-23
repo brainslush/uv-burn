@@ -20,7 +20,7 @@ jobs:
       contents: write   # needed to push a tag
     if: needs.lint.result == 'success'
     outputs:
-      tag: ${{ steps.tag.outputs.tag }}
+      created: ${{ steps.created.outputs.created }}
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -66,4 +66,4 @@ jobs:
   publish:
     uses: ./.github/workflows/publish-testpypi.yml
     needs: [lint, autotag]
-    if: needs.lint.result == 'success' && needs.autotag.outputs.tag != '' && needs.autotag.outputs.created == 'true'
+    if: needs.lint.result == 'success' && (needs.autotag.result == 'success' && needs.autotag.outputs.created == 'true')
