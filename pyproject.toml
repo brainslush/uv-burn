@@ -1,6 +1,6 @@
 [project]
 name = "uv-burn"
-version = "0.1.0.dev0"
+version = "0.1.0"
 description = "Convert uv (Astral) project files (pyproject.toml + uv.lock) into Pipenv (Pipfile + Pipfile.lock) so security tooling like Veracode can scan projects that don't yet support uv directly."
 readme = "README.md"
 license = { file = "LICENSE" }

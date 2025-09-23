@@ -63,7 +63,7 @@ jobs:
           git tag -a "$TAG" -m "Release $TAG"
           git push origin "$TAG"
 
-  build-and-publish:
+  build-and-publish-testpypi:
     name: Build and Publish to TestPyPI
     runs-on: ubuntu-latest
     environment: testpypi
@@ -85,4 +85,28 @@ jobs:
         run: uv build
 
       - name: Publish to TestPyPI
-        run: uv publish --index testpypi   
+        run: uv publish --index testpypi
+  
+  build-and-publish-pypi:
+    name: Build and Publish to PyPI
+    runs-on: ubuntu-latest
+    environment: pypi
+    permissions:
+      contents: read
+      id-token: write
+    needs: [build-and-publish-testpypi]
+    if: needs.build-and-publish-testpypi.result == 'success' && (needs.autotag.result == 'success' && needs.autotag.outputs.created == 'true')
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Install uv
+        uses: astral-sh/setup-uv@v6
+        with:
+          enable-cache: true
+
+      - name: Build package
+        run: uv build
+
+      - name: Publish to PyPI
+        run: uv publish   
