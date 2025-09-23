@@ -19,5 +19,8 @@ jobs:
         with:
           enable-cache: true
 
+      - name: Build package
+        run: uv build
+
       - name: Publish to TestPyPI
         run: uv publish --index testpypi
