@@ -4,6 +4,9 @@ on:
   push:
     tags:
       - 'v*'
+  repository_dispatch:
+    types: [tag-created]
+  workflow_dispatch:
 
 jobs:
   build-and-publish:
@@ -13,8 +16,19 @@ jobs:
     permissions:
       contents: read
     steps:
+      - name: Determine checkout ref
+        id: checkout-ref
+        run: |
+          if [ "${{ github.event_name }}" = "repository_dispatch" ]; then
+            echo "ref=${{ github.event.client_payload.tag }}" >> "$GITHUB_OUTPUT"
+          else
+            echo "ref=${{ github.ref }}" >> "$GITHUB_OUTPUT"
+          fi
+
       - name: Checkout code
         uses: actions/checkout@v4
+        with:
+          ref: ${{ steps.checkout-ref.outputs.ref }}
 
       - name: Install uv
         uses: astral-sh/setup-uv@v6
