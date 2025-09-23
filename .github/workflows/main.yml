@@ -64,9 +64,27 @@ jobs:
           git push origin "$TAG"
 
   publish:
-    uses: ./.github/workflows/publish-testpypi.yml
-    needs: [lint, autotag]
+
+   build-and-publish:
+    name: Build and Publish to TestPyPI
+    runs-on: ubuntu-latest
+    environment: testpypi
     permissions:
       contents: read
       id-token: write
+    needs: [lint, autotag]
     if: needs.lint.result == 'success' && (needs.autotag.result == 'success' && needs.autotag.outputs.created == 'true')
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Install uv
+        uses: astral-sh/setup-uv@v6
+        with:
+          enable-cache: true
+
+      - name: Build package
+        run: uv build
+
+      - name: Publish to TestPyPI
+        run: uv publish --index testpypi   
