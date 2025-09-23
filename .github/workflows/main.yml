@@ -50,12 +50,12 @@ jobs:
           if git rev-parse -q --verify "refs/tags/$TAG" >/dev/null; then
             echo "Tag $TAG already exists. Nothing to do."
             echo "created=false" >> "$GITHUB_OUTPUT"
-            exit 0
           fi
           echo "Tag $TAG does not exist, creating..."
           echo "created=true" >> "$GITHUB_OUTPUT"
 
       - name: Create and push tag
+        if: steps.created.outputs.created == 'true'
         run: |
           TAG="${{ steps.tag.outputs.tag }}"
           git config user.name "github-actions"
@@ -66,4 +66,7 @@ jobs:
   publish:
     uses: ./.github/workflows/publish-testpypi.yml
     needs: [lint, autotag]
+    permissions:
+      contents: read
+      id-token: write
     if: needs.lint.result == 'success' && (needs.autotag.result == 'success' && needs.autotag.outputs.created == 'true')
