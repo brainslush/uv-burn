@@ -2,8 +2,8 @@ name: Publish to TestPyPI
 
 on:
   push:
-    branches: [ main ]
-  workflow_dispatch:
+    tags:
+      - 'v*.*.*'
 
 jobs:
   build-and-publish:
@@ -20,6 +20,9 @@ jobs:
         uses: astral-sh/setup-uv@v6
         with:
           enable-cache: true
+
+      - name: Compare Tag and Version
+        run: uv version --short
 
       - name: Publish to TestPyPI
         run: uv publish --index testpypi
