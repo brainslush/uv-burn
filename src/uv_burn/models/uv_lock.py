@@ -30,7 +30,7 @@ class Dependency(BaseModel):
       { name = "click" }
       { name = "colorama", marker = "sys_platform == 'win32'" }
       { name = "beanie", specifier = "~=1.30.0" }
-      { name = "nga-controls-library-tools-cli", editable = "packages/cli" }
+      { name = "sub-package", editable = "packages/cli" }
 
     Allow extra fields for forward compatibility.
     """
