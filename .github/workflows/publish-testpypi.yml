@@ -1,6 +1,6 @@
 name: Publish to TestPyPI
 
-on:
+"on":
   push:
     tags:
       - 'v*'

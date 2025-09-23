@@ -1,6 +1,6 @@
 name: Lint and Autotag
 
-on:
+"on":
   push:
     branches:
       - main
