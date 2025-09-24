@@ -80,7 +80,7 @@ def save_pipfile(pipfile: Pipfile, pipfile_path: Path) -> None:
         pipfile (Pipfile): The Pipfile model to save.
         pipfile_path (Path): The path to the Pipfile to save.
     """
-    toml = tomli_w.dumps(pipfile.model_dump(mode="json", exclude_none=True, exclude_unset=True))
+    toml = tomli_w.dumps(pipfile.model_dump(mode="json", exclude_none=True))
     pipfile_path.write_text(toml)
 
 
