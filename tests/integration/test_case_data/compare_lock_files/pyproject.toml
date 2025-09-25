@@ -1,0 +1,25 @@
+[project]
+name = "compare-lock-files"
+version = "0.1.0"
+description = "Convert uv (Astral) project files (pyproject.toml + uv.lock) into Pipenv (Pipfile + Pipfile.lock) so security tooling like Veracode can scan projects that don't yet support uv directly."
+readme = "README.md"
+license = { file = "LICENSE" }
+keywords = ["uv", "pipenv", "converter", "veracode", "security", "pyproject", "lockfile"]
+classifiers = [
+    "Private :: Do Not Upload",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.12",
+    "License :: OSI Approved :: MIT License",
+    "Intended Audience :: Developers",
+    "Topic :: Software Development :: Build Tools",
+    "Topic :: Security",
+]
+requires-python = ">=3.12"
+dependencies = [
+    "httpx>=0.28.1",
+    "packaging>=25.0",
+    "pydantic>=2.11.7",
+    "rich>=14.1.0",
+    "tomli-w>=1.2.0",
+    "typer>=0.16.1",
+]
